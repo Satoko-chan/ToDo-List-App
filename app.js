@@ -2,6 +2,7 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const date = require(__dirname + "/date");
 
 const app = express();
@@ -11,8 +12,9 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-let items = ["Buy Food", "Cook Food", "Eat Food"];
-let workItems = [];
+mongoose.connect("mongodb://localhost:27017/todolistDB", {
+  useNewUrlParser: true,
+});
 
 app.get("/", function (req, res) {
   let day = date.getDate();
