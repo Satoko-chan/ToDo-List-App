@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 // const date = require(__dirname + "/date");
+const _ = require("lodash");
 
 const app = express();
 
@@ -67,7 +68,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/:customListName", function (req, res) {
-  customListName = req.params.customListName;
+  customListName = _.capitalize(req.params.customListName);
   List.findOne({ name: customListName }, function (err, foundList) {
     if (!err) {
       if (!foundList) {
@@ -116,12 +117,26 @@ app.post("/", function (req, res) {
 
 app.post("/delete", function (req, res) {
   const checkedBoxId = req.body.checkbox;
-  Item.findByIdAndRemove(checkedBoxId, function (err) {
-    if (!err) {
-      console.log("Deleted!");
-      res.redirect("/");
-    }
-  });
+  const listName = req.body.listName;
+
+  if (listName === "Today") {
+    Item.findByIdAndRemove(checkedBoxId, function (err) {
+      if (!err) {
+        console.log("Deleted!");
+        res.redirect("/");
+      }
+    });
+  } else {
+    List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: checkedBoxId } } },
+      function (err, foundList) {
+        if (!err) {
+          res.redirect("/" + listName);
+        }
+      }
+    );
+  }
 });
 
 // app.get("/work", function (req, res) {
