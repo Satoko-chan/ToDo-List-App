@@ -3,7 +3,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-// const date = require(__dirname + "/date");
+const date = require(__dirname + "/date");
 const _ = require("lodash");
 
 const app = express();
@@ -43,9 +43,9 @@ const listSchema = {
 
 const List = mongoose.model("List", listSchema);
 
-app.get("/", function (req, res) {
-  // let day = date.getDate();
+const day = date.getDate();
 
+app.get("/", function (req, res) {
   Item.find({}, function (err, foundItems) {
     if (foundItems.length === 0) {
       Item.insertMany(defaultitItems, function (err) {
@@ -58,8 +58,7 @@ app.get("/", function (req, res) {
       res.redirect("/");
     } else {
       res.render("list", {
-        // listTitle: day,
-        listTitle: "Today",
+        listTitle: day,
         // newListItems: workItems,
         newListItems: foundItems,
       });
@@ -95,7 +94,7 @@ app.post("/", function (req, res) {
     name: itemName,
   });
 
-  if (listName === "Today") {
+  if (listName === day) {
     item.save();
     res.redirect("/");
   } else {
@@ -119,7 +118,7 @@ app.post("/delete", function (req, res) {
   const checkedBoxId = req.body.checkbox;
   const listName = req.body.listName;
 
-  if (listName === "Today") {
+  if (listName === day) {
     Item.findByIdAndRemove(checkedBoxId, function (err) {
       if (!err) {
         console.log("Deleted!");
