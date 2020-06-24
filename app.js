@@ -107,7 +107,6 @@ app.post("/", function (req, res) {
       res.redirect("/" + listName);
     });
   }
-
   // if (req.body.list === "Work") {
   //   workItems.push(item);
   //   res.redirect("/work");
